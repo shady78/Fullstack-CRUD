@@ -5,11 +5,13 @@ import { StudentsService } from '../services/students.service';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+
 
 @Component({
   selector: 'app-students',
   standalone: true,
-  imports: [AsyncPipe , CommonModule,RouterLink],
+  imports: [AsyncPipe ,ReactiveFormsModule, CommonModule,RouterLink],
   templateUrl: './students.component.html',
   styleUrl: './students.component.css'
 })
@@ -17,16 +19,32 @@ export class StudentsComponent implements OnInit{
   
   students$!:Observable<Student[]>
   //studentService = Inject(StudentsService);
+  form!:  FormGroup;
   
-  constructor(private studentService:StudentsService , private toaster:ToastrService) {
-  
-    
+  constructor(private fb:FormBuilder, private studentService:StudentsService , private toaster:ToastrService) {
   }
   
   ngOnInit(): void {
-   this.getStudents();
+    this.initializeForm();
+   this.getStudents(); 
   }
 
+
+  private initializeForm(): void {
+    this.form = this.fb.group({
+      searchControl: [''] // Initialize the searchControl field
+    });
+      // Subscribe to form value changes
+    this.form.get('searchControl')!.valueChanges.subscribe(name => {
+      if (name) {
+        this.getAStudentByname(name);
+      } else {
+        this.getStudents();
+      }
+    });
+  }
+
+  
   delete(id:number){
     console.log(id);
 
@@ -46,5 +64,8 @@ export class StudentsComponent implements OnInit{
     this.students$ = this.studentService.getStudents()
 
   }
-
+    
+  getAStudentByname(name: string): void {
+    this.students$ = this.studentService.getStudentSearch(name);
+  }
 }
