@@ -103,5 +103,19 @@ namespace Api.Controllers
             }
             return BadRequest();
         }
+
+         [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<Student>>> SearchStudents(string name)
+        {
+            var students = await _context.students
+                                         .Where(s => s.Name.Contains(name))
+                                         .AsNoTracking()
+                                         .ToListAsync();
+            if (!students.Any())
+            {
+                return NotFound("No students found with the provided name.");
+            }
+            return Ok(students);
+        }
     }
 }
