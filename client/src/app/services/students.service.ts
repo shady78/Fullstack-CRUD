@@ -11,6 +11,11 @@ export class StudentsService {
   apiUrl = "http://localhost:5290/api/students"
   constructor(private http:HttpClient) { }
 
+   getStudentSearch = (name: string): Observable<Student[]> => {
+    const params = new HttpParams().set('name', name);
+    return this.http.get<Student[]>(`${this.apiUrl}/search`, { params });
+  };
+  
   getStudents=():Observable<Student[]> => this.http.get<Student[]>(this.apiUrl);
 
   addStudent=(data:Student)=> this.http.post(this.apiUrl,data);
